@@ -188,9 +188,12 @@ class binance(Exchange, ImplicitAPI):
                     'dapiPrivateV2': 'https://dapi.binance.com/dapi/v2',
                     'dapiData': 'https://dapi.binance.com/futures/data',
                     'fapiPublic': 'https://fapi.binance.com/fapi/v1',
+                    'fapiPublicV2': 'https://fapi.binance.com/fapi/v2',
+                    'fapiPublicV3': 'https://fapi.binance.com/fapi/v3',
                     'fapiPrivate': 'https://fapi.binance.com/fapi/v1',
-                    'fapiData': 'https://fapi.binance.com/futures/data',
                     'fapiPrivateV2': 'https://fapi.binance.com/fapi/v2',
+                    'fapiPrivateV3': 'https://fapi.binance.com/fapi/v3',
+                    'fapiData': 'https://fapi.binance.com/futures/data',
                     'public': 'https://api.binance.com/api/v3',
                     'private': 'https://api.binance.com/api/v3',
                     'v1': 'https://api.binance.com/api/v1',
@@ -220,6 +223,7 @@ class binance(Exchange, ImplicitAPI):
                         'system/status': 0.1,
                         # these endpoints require self.apiKey
                         'accountSnapshot': 240,  # Weight(IP): 2400 => cost = 0.1 * 2400 = 240
+                        'account/info': 0.1,
                         'margin/asset': 1,  # Weight(IP): 10 => cost = 0.1 * 10 = 1
                         'margin/pair': 1,
                         'margin/allAssets': 0.1,
@@ -260,7 +264,7 @@ class binance(Exchange, ImplicitAPI):
                         'margin/isolatedMarginTier': 0.1,
                         'margin/rateLimit/order': 2,
                         'margin/dribblet': 0.1,
-                        'margin/dust': 20,  # Weight(UID): 3000 => cost = 0.006667 * 3000 = 20
+                        'margin/dust': 20.001,  # Weight(UID): 3000 => cost = 0.006667 * 3000 = 20
                         'margin/crossMarginCollateralRatio': 10,
                         'margin/exchange-small-liability': 0.6667,
                         'margin/exchange-small-liability-history': 0.6667,
@@ -282,24 +286,22 @@ class binance(Exchange, ImplicitAPI):
                         'fiat/orders': 600.03,  # Weight(UID): 90000 => cost = 0.006667 * 90000 = 600.03
                         'fiat/payments': 0.1,
                         'futures/transfer': 1,
-                        'futures/loan/borrow/history': 1,
-                        'futures/loan/repay/history': 1,
-                        'futures/loan/wallet': 1,
-                        'futures/loan/adjustCollateral/history': 1,
-                        'futures/loan/liquidationHistory': 1,
-                        'rebate/taxQuery': 20.001,  # Weight(UID): 3000 => cost = 0.006667 * 3000 = 20.001
-                        # https://binance-docs.github.io/apidocs/spot/en/#withdraw-sapi
+                        'futures/histDataLink': 0.1,  # Weight(IP): 1 => cost = 0.1 * 1 = 0.1
+                        'rebate/taxQuery': 80.004,  # Weight(UID): 12000 => cost = 0.006667 * 12000 = 80.004
                         'capital/config/getall': 1,  # get networks for withdrawing USDT ERC20 vs USDT Omni
                         'capital/deposit/address': 1,
+                        'capital/deposit/address/list': 1,
                         'capital/deposit/hisrec': 0.1,
                         'capital/deposit/subAddress': 0.1,
                         'capital/deposit/subHisrec': 0.1,
-                        'capital/withdraw/history': 0.1,
-                        'capital/contract/convertible-coins': 4.0002,
-                        'convert/tradeFlow': 20.0001,  # Weight(UID): 3000 => cost = 0.006667 * 3000 = 20.0001
+                        'capital/withdraw/history': 2,  # Weight(UID): 18000 + (Additional: 10 requests per second => cost = ( 1000 / rateLimit ) / 10 = 2
+                        'capital/withdraw/address/list': 10,
+                        'capital/contract/convertible-coins': 4.0002,  # Weight(UID): 600 => cost = 0.006667 * 600 = 4.0002
+                        'convert/tradeFlow': 20.001,  # Weight(UID): 3000 => cost = 0.006667 * 3000 = 20.001
                         'convert/exchangeInfo': 50,
                         'convert/assetInfo': 10,
                         'convert/orderStatus': 0.6667,
+                        'convert/limit/queryOpenOrders': 20.001,  # Weight(UID): 3000 => cost = 0.006667 * 3000 = 20.001
                         'account/status': 0.1,
                         'account/apiTradingStatus': 0.1,
                         'account/apiRestrictions/ipRestriction': 0.1,
@@ -318,15 +320,16 @@ class binance(Exchange, ImplicitAPI):
                         'sub-account/transfer/subUserHistory': 0.1,
                         'sub-account/universalTransfer': 0.1,
                         'sub-account/apiRestrictions/ipRestriction/thirdPartyList': 1,
-                        'sub-account/transaction-tatistics': 0.4,
+                        'sub-account/transaction-statistics': 0.40002,  # Weight(UID): 60 => cost = 0.006667 * 60 = 0.40002
+                        'sub-account/subAccountApi/ipRestriction': 20.001,  # Weight(UID): 3000 => cost = 0.006667 * 3000 = 20.001
                         'managed-subaccount/asset': 0.1,
                         'managed-subaccount/accountSnapshot': 240,
                         'managed-subaccount/queryTransLogForInvestor': 0.1,
-                        'managed-subaccount/queryTransLogForTradeParent': 0.1,
-                        'managed-subaccount/fetch-future-asset': 0.1,
+                        'managed-subaccount/queryTransLogForTradeParent': 0.40002,  # Weight(UID): 60 => cost = 0.006667 * 60 = 0.40002
+                        'managed-subaccount/fetch-future-asset': 0.40002,  # Weight(UID): 60 => cost = 0.006667 * 60 = 0.40002
                         'managed-subaccount/marginAsset': 0.1,
-                        'managed-subaccount/info': 0.4,
-                        'managed-subaccount/deposit/address': 0.1,
+                        'managed-subaccount/info': 0.40002,  # Weight(UID): 60 => cost = 0.006667 * 60 = 0.40002
+                        'managed-subaccount/deposit/address': 0.006667,  # Weight(UID): 1 => cost = 0.006667 * 1 = 0.006667
                         'managed-subaccount/query-trans-log': 0.40002,
                         # lending endpoints
                         'lending/daily/product/list': 0.1,
@@ -400,10 +403,13 @@ class binance(Exchange, ImplicitAPI):
                         'nft/history/deposit': 20.001,
                         'nft/history/withdraw': 20.001,
                         'nft/user/getAsset': 20.001,
-                        'pay/transactions': 20.001,  # Weight(UID): 3000 => cost = 0.006667 * 3000 = 20.001
+                        'pay/transactions': 20.001,
                         'giftcard/verify': 0.1,
                         'giftcard/cryptography/rsa-public-key': 0.1,
                         'giftcard/buyCode/token-limit': 0.1,
+                        'algo/spot/openOrders': 0.1,
+                        'algo/spot/historicalOrders': 0.1,
+                        'algo/spot/subOrders': 0.1,
                         'algo/futures/openOrders': 0.1,
                         'algo/futures/historicalOrders': 0.1,
                         'algo/futures/subOrders': 0.1,
@@ -413,18 +419,29 @@ class binance(Exchange, ImplicitAPI):
                         'portfolio/interest-history': 0.6667,
                         'portfolio/asset-index-price': 0.1,
                         'portfolio/repay-futures-switch': 3,  # Weight(IP): 30 => cost = 0.1 * 30 = 3
+                        'portfolio/margin-asset-leverage': 5,  # Weight(IP): 50 => cost = 0.1 * 50 = 5
+                        'portfolio/balance': 2,
+                        'portfolio/negative-balance-exchange-record': 2,
+                        'portfolio/pmloan-history': 5,
+                        'portfolio/earn-asset-balance': 150,  # Weight(IP): 1500 => cost = 0.1 * 1500 = 150
+                        'portfolio/delta-mode': 150,  # Weight(IP): 1500 => cost = 0.1 * 1500 = 150
                         # staking
                         'staking/productList': 0.1,
                         'staking/position': 0.1,
                         'staking/stakingRecord': 0.1,
                         'staking/personalLeftQuota': 0.1,
                         'lending/auto-invest/target-asset/list': 0.1,  # Weight(IP): 1 => cost = 0.1 * 1 = 0.1
-                        'lending/auto-invest/target-asset/roi/list': 0.1,  # Weight(IP): 1 => cost = 0.1 * 1 = 0.1
-                        'lending/auto-invest/all/asset': 0.1,  # Weight(IP): 1 => cost = 0.1 * 1 = 0.1
-                        'lending/auto-invest/source-asset/list': 0.1,  # Weight(IP): 1 => cost = 0.1 * 1 = 0.1
-                        'lending/auto-invest/plan/list': 0.1,  # Weight(IP): 1 => cost = 0.1 * 1 = 0.1
-                        'lending/auto-invest/plan/id': 0.1,  # Weight(IP): 1 => cost = 0.1 * 1 = 0.1
-                        'lending/auto-invest/history/list': 0.1,  # Weight(IP): 1 => cost = 0.1 * 1 = 0.1
+                        'lending/auto-invest/target-asset/roi/list': 0.1,
+                        'lending/auto-invest/all/asset': 0.1,
+                        'lending/auto-invest/source-asset/list': 0.1,
+                        'lending/auto-invest/plan/list': 0.1,
+                        'lending/auto-invest/plan/id': 0.1,
+                        'lending/auto-invest/history/list': 0.1,
+                        'lending/auto-invest/index/info': 0.1,  # Weight(IP): 1 => cost = 0.1 * 1 = 0.1
+                        'lending/auto-invest/index/user-summary': 0.1,  # Weight(IP): 1 => cost = 0.1 * 1 = 0.1
+                        'lending/auto-invest/one-off/status': 0.1,  # Weight(IP): 1 => cost = 0.1 * 1 = 0.1
+                        'lending/auto-invest/redeem/history': 0.1,  # Weight(IP): 1 => cost = 0.1 * 1 = 0.1
+                        'lending/auto-invest/rebalance/history': 0.1,  # Weight(IP): 1 => cost = 0.1 * 1 = 0.1
                         # simple earn
                         'simple-earn/flexible/list': 15,
                         'simple-earn/locked/list': 15,
@@ -445,9 +462,9 @@ class binance(Exchange, ImplicitAPI):
                         'simple-earn/flexible/history/collateralRecord': 0.1,
                     },
                     'post': {
-                        'asset/dust': 1,
+                        'asset/dust': 0.06667,  # Weight(UID): 10 => cost = 0.006667 * 10 = 0.06667
                         'asset/dust-btc': 0.1,
-                        'asset/transfer': 0.1,
+                        'asset/transfer': 6.0003,  # Weight(UID): 900 => cost = 0.006667 * 900 = 6.0003
                         'asset/get-funding-asset': 0.1,
                         'asset/convert-transfer': 0.033335,
                         'account/disableFastWithdrawSwitch': 0.1,
@@ -457,12 +474,13 @@ class binance(Exchange, ImplicitAPI):
                         'capital/withdraw/apply': 4.0002,  # Weight(UID): 600 => cost = 0.006667 * 600 = 4.0002
                         'capital/contract/convertible-coins': 4.0002,
                         'capital/deposit/credit-apply': 0.1,  # Weight(IP): 1 => cost = 0.1 * 1 = 0.1
-                        'margin/transfer': 1,  # Weight(IP): 600 => cost = 0.1 * 600 = 60
+                        'margin/borrow-repay': 20.001,
+                        'margin/transfer': 4.0002,
                         'margin/loan': 20.001,  # Weight(UID): 3000 => cost = 0.006667 * 3000 = 20.001
                         'margin/repay': 20.001,
                         'margin/order': 0.040002,  # Weight(UID): 6 => cost = 0.006667 * 6 = 0.040002
                         'margin/order/oco': 0.040002,
-                        'margin/dust': 20,  # Weight(UID): 3000 => cost = 0.006667 * 3000 = 20
+                        'margin/dust': 20.001,  # Weight(UID): 3000 => cost = 0.006667 * 3000 = 20.001
                         'margin/exchange-small-liability': 20.001,
                         # 'margin/isolated/create': 1, discontinued
                         'margin/isolated/transfer': 4.0002,  # Weight(UID): 600 => cost = 0.006667 * 600 = 4.0002
@@ -485,6 +503,7 @@ class binance(Exchange, ImplicitAPI):
                         'managed-subaccount/withdraw': 0.1,
                         'userDataStream': 0.1,
                         'userDataStream/isolated': 0.1,
+                        'userListenToken': 0.1,
                         'futures/transfer': 0.1,
                         # lending
                         'lending/customizedFixed/purchase': 0.1,
@@ -526,6 +545,7 @@ class binance(Exchange, ImplicitAPI):
                         'giftcard/createCode': 0.1,
                         'giftcard/redeemCode': 0.1,
                         'giftcard/buyCode': 0.1,
+                        'algo/spot/newOrderTwap': 20.001,
                         'algo/futures/newOrderVp': 20.001,
                         'algo/futures/newOrderTwap': 20.001,
                         # staking
@@ -533,23 +553,33 @@ class binance(Exchange, ImplicitAPI):
                         'staking/redeem': 0.1,
                         'staking/setAutoStaking': 0.1,
                         'portfolio/repay': 20.001,
-                        'loan/vip/renew': 40,  # Weight(UID): 6000 => cost = 0.006667 * 6000 = 40
-                        'loan/vip/borrow': 40,  # Weight(UID): 6000 => cost = 0.006667 * 6000 = 40
-                        'loan/borrow': 40,  # Weight(UID): 6000 => cost = 0.006667 * 6000 = 40
-                        'loan/repay': 40,  # Weight(UID): 6000 => cost = 0.006667 * 6000 = 40
-                        'loan/adjust/ltv': 40,  # Weight(UID): 6000 => cost = 0.006667 * 6000 = 40
-                        'loan/customize/margin_call': 40,  # Weight(UID): 6000 => cost = 0.006667 * 6000 = 40
-                        'loan/vip/repay': 40,  # Weight(UID): 6000 => cost = 0.006667 * 6000 = 40
-                        'convert/getQuote': 20.001,
-                        'convert/acceptQuote': 3.3335,
+                        'loan/vip/renew': 40.002,  # Weight(UID): 6000 => cost = 0.006667 * 6000 = 40.002
+                        'loan/vip/borrow': 40.002,
+                        'loan/borrow': 40.002,
+                        'loan/repay': 40.002,
+                        'loan/adjust/ltv': 40.002,
+                        'loan/customize/margin_call': 40.002,
+                        'loan/flexible/repay': 40.002,  # TODO: Deprecating at 2024-04-24 03:00(UTC)
+                        'loan/flexible/adjust/ltv': 40.002,  # TODO: Deprecating at 2024-04-24 03:00(UTC)
+                        'loan/vip/repay': 40.002,
+                        'convert/getQuote': 1.3334,  # Weight(UID): 200 => cost = 0.006667 * 200 = 1.3334
+                        'convert/acceptQuote': 3.3335,  # Weight(UID): 500 => cost = 0.006667 * 500 = 3.3335
+                        'convert/limit/placeOrder': 3.3335,  # Weight(UID): 500 => cost = 0.006667 * 500 = 3.3335
+                        'convert/limit/cancelOrder': 1.3334,  # Weight(UID): 200 => cost = 0.006667 * 200 = 1.3334
                         'portfolio/auto-collection': 150,  # Weight(IP): 1500 => cost = 0.1 * 1500 = 150
                         'portfolio/asset-collection': 6,  # Weight(IP): 60 => cost = 0.1 * 60 = 6
                         'portfolio/bnb-transfer': 150,  # Weight(IP): 1500 => cost = 0.1 * 1500 = 150
                         'portfolio/repay-futures-switch': 150,  # Weight(IP): 1500 => cost = 0.1 * 1500 = 150
                         'portfolio/repay-futures-negative-balance': 150,  # Weight(IP): 1500 => cost = 0.1 * 1500 = 150
+                        'portfolio/mint': 20,
+                        'portfolio/redeem': 20,
+                        'portfolio/earn-asset-transfer': 150,  # Weight(IP): 1500 => cost = 0.1 * 1500 = 150
+                        'portfolio/delta-mode': 150,  # Weight(IP): 1500 => cost = 0.1 * 1500 = 150
                         'lending/auto-invest/plan/add': 0.1,  # Weight(IP): 1 => cost = 0.1 * 1 = 0.1
                         'lending/auto-invest/plan/edit': 0.1,  # Weight(IP): 1 => cost = 0.1 * 1 = 0.1
                         'lending/auto-invest/plan/edit-status': 0.1,  # Weight(IP): 1 => cost = 0.1 * 1 = 0.1
+                        'lending/auto-invest/one-off': 0.1,  # Weight(IP): 1 => cost = 0.1 * 1 = 0.1
+                        'lending/auto-invest/redeem': 0.1,  # Weight(IP): 1 => cost = 0.1 * 1 = 0.1
                         # simple earn
                         'simple-earn/flexible/subscribe': 0.1,
                         'simple-earn/locked/subscribe': 0.1,
@@ -565,26 +595,29 @@ class binance(Exchange, ImplicitAPI):
                     'delete': {
                         # 'account/apiRestrictions/ipRestriction/ipList': 1, discontinued
                         'margin/openOrders': 0.1,
-                        'margin/order': 0.0066667,  # Weight(UID): 1 => cost = 0.006667
-                        'margin/orderList': 0.0066667,
+                        'margin/order': 0.006667,  # Weight(UID): 1 => cost = 0.006667
+                        'margin/orderList': 0.006667,
                         'margin/isolated/account': 2.0001,  # Weight(UID): 300 => cost =  0.006667 * 300 = 2.0001
                         'userDataStream': 0.1,
                         'userDataStream/isolated': 0.1,
                         # brokerage API TODO NO MENTION OF RATELIMIT IN BROKERAGE DOCS
                         'broker/subAccountApi': 1,
                         'broker/subAccountApi/ipRestriction/ipList': 1,
+                        'algo/spot/order': 0.1,
                         'algo/futures/order': 0.1,
+                        'sub-account/subAccountApi/ipRestriction/ipList': 20.001,  # Weight(UID): 3000 => cost = 0.006667 * 3000 = 20.001
                     },
                 },
                 'sapiV2': {
                     'get': {
                         'sub-account/futures/account': 0.1,
+                        'sub-account/futures/accountSummary': 1,
                         'sub-account/futures/positionRisk': 0.1,
                     },
                 },
                 'sapiV3': {
                     'get': {
-                        'sub-account/assets': 1,
+                        'sub-account/assets': 0.40002,  # Weight(UID): 60 => cost =  0.006667 * 60 = 0.40002
                     },
                     'post': {
                         'asset/getUserAsset': 0.5,
@@ -592,28 +625,7 @@ class binance(Exchange, ImplicitAPI):
                 },
                 'sapiV4': {
                     'get': {
-                        'sub-account/assets': 1,
-                    },
-                },
-                # deprecated
-                'wapi': {
-                    'post': {
-                        'withdraw': 1,
-                        'sub-account/transfer': 1,
-                    },
-                    'get': {
-                        'depositHistory': 1,
-                        'withdrawHistory': 1,
-                        'depositAddress': 1,
-                        'accountStatus': 1,
-                        'systemStatus': 1,
-                        'apiTradingStatus': 1,
-                        'userAssetDribbletLog': 1,
-                        'tradeFee': 1,
-                        'assetDetail': 1,
-                        'sub-account/list': 1,
-                        'sub-account/transfer/history': 1,
-                        'sub-account/assets': 1,
+                        'sub-account/assets': 0.40002,  # Weight(UID): 60 => cost = 0.006667 * 60 = 0.40002
                     },
                 },
                 'dapiPublic': {
@@ -631,14 +643,18 @@ class binance(Exchange, ImplicitAPI):
                         'continuousKlines': {'cost': 1, 'byLimit': [[99, 1], [499, 2], [1000, 5], [10000, 10]]},
                         'indexPriceKlines': {'cost': 1, 'byLimit': [[99, 1], [499, 2], [1000, 5], [10000, 10]]},
                         'markPriceKlines': {'cost': 1, 'byLimit': [[99, 1], [499, 2], [1000, 5], [10000, 10]]},
+                        'premiumIndexKlines': {'cost': 1, 'byLimit': [[99, 1], [499, 2], [1000, 5], [10000, 10]]},
                         'ticker/24hr': {'cost': 1, 'noSymbol': 40},
                         'ticker/price': {'cost': 1, 'noSymbol': 2},
-                        'ticker/bookTicker': {'cost': 1, 'noSymbol': 2},
+                        'ticker/bookTicker': {'cost': 2, 'noSymbol': 5},
+                        'constituents': 2,
                         'openInterest': 1,
+                        'fundingInfo': 1,
                     },
                 },
                 'dapiData': {
                     'get': {
+                        'delivery-price': 1,
                         'openInterestHist': 1,
                         'topLongShortAccountRatio': 1,
                         'topLongShortPositionRatio': 1,
@@ -650,6 +666,7 @@ class binance(Exchange, ImplicitAPI):
                 'dapiPrivate': {
                     'get': {
                         'positionSide/dual': 30,
+                        'orderAmendment': 1,
                         'order': 1,
                         'openOrder': 1,
                         'openOrders': {'cost': 1, 'noSymbol': 5},
@@ -663,8 +680,15 @@ class binance(Exchange, ImplicitAPI):
                         'leverageBracket': 1,
                         'forceOrders': {'cost': 20, 'noSymbol': 50},
                         'adlQuantile': 5,
-                        'orderAmendment': 1,
-                        'pmAccountInfo': 5,
+                        'commissionRate': 20,
+                        'income/asyn': 5,
+                        'income/asyn/id': 5,
+                        'trade/asyn': 0.5,
+                        'trade/asyn/id': 0.5,
+                        'order/asyn': 0.5,
+                        'order/asyn/id': 0.5,
+                        'pmExchangeInfo': 0.5,  # Weight(IP): 5 => cost = 0.1 * 5 = 0.5
+                        'pmAccountInfo': 0.5,  # Weight(IP): 5 => cost = 0.1 * 5 = 0.5
                     },
                     'post': {
                         'positionSide/dual': 1,
@@ -699,6 +723,7 @@ class binance(Exchange, ImplicitAPI):
                         'time': 1,
                         'exchangeInfo': 1,
                         'depth': {'cost': 2, 'byLimit': [[50, 2], [100, 5], [500, 10], [1000, 20]]},
+                        'rpiDepth': 20,
                         'trades': 5,
                         'historicalTrades': 20,
                         'aggTrades': 20,
@@ -706,24 +731,34 @@ class binance(Exchange, ImplicitAPI):
                         'continuousKlines': {'cost': 1, 'byLimit': [[99, 1], [499, 2], [1000, 5], [10000, 10]]},
                         'markPriceKlines': {'cost': 1, 'byLimit': [[99, 1], [499, 2], [1000, 5], [10000, 10]]},
                         'indexPriceKlines': {'cost': 1, 'byLimit': [[99, 1], [499, 2], [1000, 5], [10000, 10]]},
+                        'premiumIndexKlines': {'cost': 1, 'byLimit': [[99, 1], [499, 2], [1000, 5], [10000, 10]]},
                         'fundingRate': 1,
+                        'fundingInfo': 1,
                         'premiumIndex': 1,
                         'ticker/24hr': {'cost': 1, 'noSymbol': 40},
                         'ticker/price': {'cost': 1, 'noSymbol': 2},
                         'ticker/bookTicker': {'cost': 1, 'noSymbol': 2},
                         'openInterest': 1,
                         'indexInfo': 1,
+                        'assetIndex': {'cost': 1, 'noSymbol': 10},
+                        'constituents': 2,
                         'apiTradingStatus': {'cost': 1, 'noSymbol': 10},
                         'lvtKlines': 1,
+                        'convert/exchangeInfo': 4,
+                        'insuranceBalance': 1,
+                        'symbolAdlRisk': 1,
+                        'tradingSchedule': 5,
                     },
                 },
                 'fapiData': {
                     'get': {
+                        'delivery-price': 1,
                         'openInterestHist': 1,
                         'topLongShortAccountRatio': 1,
                         'topLongShortPositionRatio': 1,
                         'globalLongShortAccountRatio': 1,
                         'takerlongshortRatio': 1,
+                        'basis': 1,
                     },
                 },
                 'fapiPrivate': {
@@ -731,7 +766,7 @@ class binance(Exchange, ImplicitAPI):
                         'forceOrders': {'cost': 20, 'noSymbol': 50},
                         'allOrders': 5,
                         'openOrder': 1,
-                        'openOrders': 1,
+                        'openOrders': {'cost': 1, 'noSymbol': 40},
                         'order': 1,
                         'account': 5,
                         'balance': 5,
@@ -742,6 +777,7 @@ class binance(Exchange, ImplicitAPI):
                         'userTrades': 5,
                         'income': 30,
                         'commissionRate': 20,
+                        'rateLimit/order': 1,
                         'apiTradingStatus': 1,
                         'multiAssetsMargin': 30,
                         # broker endpoints
@@ -756,10 +792,21 @@ class binance(Exchange, ImplicitAPI):
                         'adlQuantile': 5,
                         'pmAccountInfo': 5,
                         'orderAmendment': 1,
-                        'order/asyn': 5,
-                        'order/asyn/id': 5,
-                        'trade/asyn': 5,
-                        'trade/asyn/id': 5,
+                        'income/asyn': 1000,
+                        'income/asyn/id': 10,
+                        'order/asyn': 1000,
+                        'order/asyn/id': 10,
+                        'trade/asyn': 1000,
+                        'trade/asyn/id': 10,
+                        'feeBurn': 1,
+                        'symbolConfig': 5,
+                        'accountConfig': 5,
+                        'convert/orderStatus': 5,
+                        # conditional orders
+                        'algoOrder': 1,
+                        'openAlgoOrders': {'cost': 1, 'noSymbol': 40},
+                        'allAlgoOrders': 5,
+                        'stock/contract': 50,
                     },
                     'post': {
                         'batchOrders': 5,
@@ -767,6 +814,7 @@ class binance(Exchange, ImplicitAPI):
                         'positionMargin': 1,
                         'marginType': 1,
                         'order': 4,
+                        'order/test': 1,
                         'leverage': 1,
                         'listenKey': 1,
                         'countdownCancelAll': 10,
@@ -774,6 +822,11 @@ class binance(Exchange, ImplicitAPI):
                         # broker endpoints
                         'apiReferral/customization': 1,
                         'apiReferral/userCustomization': 1,
+                        'feeBurn': 1,
+                        'convert/getQuote': 200,  # 360 requests per hour
+                        'convert/acceptQuote': 20,
+                        # conditional orders
+                        'algoOrder': 1,
                     },
                     'put': {
                         'listenKey': 1,
@@ -785,9 +838,27 @@ class binance(Exchange, ImplicitAPI):
                         'order': 1,
                         'allOpenOrders': 1,
                         'listenKey': 1,
+                        # conditional orders
+                        'algoOrder': 1,
+                        'algoOpenOrders': 1,
+                    },
+                },
+                'fapiPublicV2': {
+                    'get': {
+                        'ticker/price': 0,
                     },
                 },
                 'fapiPrivateV2': {
+                    'get': {
+                        'account': 1,
+                        'balance': 1,
+                        'positionRisk': 1,
+                    },
+                },
+                'fapiPublicV3': {
+                    'get': {},
+                },
+                'fapiPrivateV3': {
                     'get': {
                         'account': 1,
                         'balance': 1,
@@ -825,6 +896,11 @@ class binance(Exchange, ImplicitAPI):
                         'mmp': 1,
                         'countdownCancelAll': 1,
                         'order': 1,
+                        'block/order/orders': 5,
+                        'block/order/execute': 5,
+                        'block/user-trades': 5,
+                        'blockTrades': 5,
+                        'comission': 5,
                     },
                     'post': {
                         'order': 1,
@@ -834,9 +910,12 @@ class binance(Exchange, ImplicitAPI):
                         'mmpReset': 1,
                         'countdownCancelAll': 1,
                         'countdownCancelAllHeartBeat': 10,
+                        'block/order/create': 5,
+                        'block/order/execute': 5,
                     },
                     'put': {
                         'listenKey': 1,
+                        'block/order/create': 5,
                     },
                     'delete': {
                         'order': 1,
@@ -844,130 +923,192 @@ class binance(Exchange, ImplicitAPI):
                         'allOpenOrders': 1,
                         'allOpenOrdersByUnderlying': 1,
                         'listenKey': 1,
+                        'block/order/create': 5,
                     },
                 },
                 'public': {
+                    # IP(api) request rate limit of 6000 per minute
+                    # 1 IP(api) => cost = 0.2 =>(1000 / (50 * 0.2)) * 60 = 6000
                     'get': {
-                        'ping': 1,
-                        'time': 1,
+                        'ping': 0.2,  # Weight(IP): 1 => cost = 0.2 * 1 = 0.2
+                        'time': 0.2,
                         'depth': {'cost': 1, 'byLimit': [[100, 1], [500, 5], [1000, 10], [5000, 50]]},
-                        'trades': 1,
-                        'aggTrades': 1,
-                        'historicalTrades': 5,
-                        'klines': 1,
-                        'ticker/24hr': {'cost': 1, 'noSymbol': 40},
-                        'ticker/price': {'cost': 1, 'noSymbol': 2},
-                        'ticker/bookTicker': {'cost': 1, 'noSymbol': 2},
-                        'exchangeInfo': 10,
+                        'trades': 2,  # Weight(IP): 10 => cost = 0.2 * 10 = 2
+                        'aggTrades': 0.4,
+                        'historicalTrades': 2,  # Weight(IP): 10 => cost = 0.2 * 10 = 2
+                        'klines': 0.4,
+                        'uiKlines': 0.4,
+                        'ticker/24hr': {'cost': 0.4, 'noSymbol': 16},
+                        'ticker': {'cost': 0.4, 'noSymbol': 16},
+                        'ticker/tradingDay': 0.8,
+                        'ticker/price': {'cost': 0.4, 'noSymbol': 0.8},
+                        'ticker/bookTicker': {'cost': 0.4, 'noSymbol': 0.8},
+                        'exchangeInfo': 4,  # Weight(IP): 20 => cost = 0.2 * 20 = 4
+                        'avgPrice': 0.4,
                     },
                     'put': {
-                        'userDataStream': 1,
+                        'userDataStream': 0.4,
                     },
                     'post': {
-                        'userDataStream': 1,
+                        'userDataStream': 0.4,
                     },
                     'delete': {
-                        'userDataStream': 1,
+                        'userDataStream': 0.4,
                     },
                 },
                 'private': {
                     'get': {
-                        'allOrderList': 10,  # oco
-                        'openOrderList': 3,  # oco
-                        'orderList': 2,  # oco
-                        'order': 2,
-                        'openOrders': {'cost': 3, 'noSymbol': 40},
-                        'allOrders': 10,
-                        'account': 10,
-                        'myTrades': 10,
-                        'rateLimit/order': 20,
-                        'myPreventedMatches': 1,
-                        'myAllocations': 10,
+                        'allOrderList': 4,  # oco Weight(IP): 20 => cost = 0.2 * 20 = 4
+                        'openOrderList': 1.2,  # oco Weight(IP): 6 => cost = 0.2 * 6 = 1.2
+                        'orderList': 0.8,  # oco
+                        'order': 0.8,
+                        'openOrders': {'cost': 1.2, 'noSymbol': 16},
+                        'allOrders': 4,
+                        'account': 4,
+                        'myTrades': 4,
+                        'rateLimit/order': 8,  # Weight(IP): 40 => cost = 0.2 * 40 = 8
+                        'myPreventedMatches': 4,  # Weight(IP): 20 => cost = 0.2 * 20 = 4
+                        'myAllocations': 4,
+                        'account/commission': 4,
                     },
                     'post': {
-                        'order/oco': 1,
-                        'sor/order': 1,
-                        'sor/order/test': 1,
-                        'order': 1,
-                        'order/cancelReplace': 1,
-                        'order/test': 1,
+                        'order/oco': 0.2,
+                        'orderList/oco': 0.2,
+                        'orderList/oto': 0.2,
+                        'orderList/otoco': 0.2,
+                        'orderList/opo': 0.2,
+                        'orderList/opoco': 0.2,
+                        'sor/order': 0.2,
+                        'sor/order/test': 0.2,
+                        'order': 0.2,
+                        'order/cancelReplace': 0.2,
+                        'order/test': 0.2,
                     },
                     'delete': {
-                        'openOrders': 1,  # added on 2020-04-25 for canceling all open orders per symbol
-                        'orderList': 1,  # oco
-                        'order': 1,
+                        'openOrders': 0.2,
+                        'orderList': 0.2,  # oco
+                        'order': 0.2,
                     },
                 },
                 'papi': {
+                    # IP(papi) request rate limit of 6000 per minute
+                    # 1 IP(papi) => cost = 0.2 =>(1000 / (50 * 0.2)) * 60 = 6000
+                    # Order(papi) request rate limit of 1200 per minute
+                    # 1 Order(papi) => cost = 1 =>(1000 / (50 * 1)) * 60 = 1200
                     'get': {
-                        'um/order': 1,  # 1
-                        'um/openOrder': 1,  # 1
-                        'um/openOrders': 1,  # 1
-                        'um/allOrders': 5,  # 5
-                        'cm/order': 1,  # 1
-                        'cm/openOrder': 1,  # 1
-                        'cm/openOrders': 1,  # 1
-                        'cm/allOrders': 20,  # 20
-                        'balance': 20,  # 20
-                        'account': 20,  # 20
-                        'margin/maxBorrowable': 5,  # 5
-                        'margin/maxWithdraw': 5,  # 5
-                        'um/positionRisk': 5,  # 5
-                        'cm/positionRisk': 1,  # 1
-                        'um/positionSide/dual': 30,  # 30
-                        'cm/positionSide/dual': 30,  # 30
-                        'um/userTrades': 5,  # 5
-                        'cm/userTrades': 20,  # 20
-                        'um/leverageBracket': 1,  # 1
-                        'cm/leverageBracket': 1,  # 1
-                        'margin/forceOrders': 1,  # 1
-                        'um/forceOrders': 20,  # 20
-                        'cm/forceOrders': 20,  # 20
-                        'um/apiTradingStatus': 1,  # 1
-                        'um/commissionRate': 20,  # 20
-                        'cm/commissionRate': 20,  # 20
-                        'um/income': 30,
-                        'cm/income ': 30,
-                        'um/account': 5,
-                        'cm/account': 5,
-                        'portfolio/repay-futures-switch': 3,  # Weight(IP): 30 => cost = 0.1 * 30 = 3
+                        'ping': 0.2,
+                        'um/order': 1,
+                        'um/openOrder': 1,
+                        'um/openOrders': {'cost': 1, 'noSymbol': 40},
+                        'um/allOrders': 5,
+                        'cm/order': 1,
+                        'cm/openOrder': 1,
+                        'cm/openOrders': {'cost': 1, 'noSymbol': 40},
+                        'cm/allOrders': 20,
+                        'um/conditional/openOrder': 1,
+                        'um/conditional/openOrders': {'cost': 1, 'noSymbol': 40},
+                        'um/conditional/orderHistory': 1,
+                        'um/conditional/allOrders': {'cost': 1, 'noSymbol': 40},
+                        'cm/conditional/openOrder': 1,
+                        'cm/conditional/openOrders': {'cost': 1, 'noSymbol': 40},
+                        'cm/conditional/orderHistory': 1,
+                        'cm/conditional/allOrders': 40,
+                        'margin/order': 10,
+                        'margin/openOrders': 5,
+                        'margin/allOrders': 100,
+                        'margin/orderList': 5,
+                        'margin/allOrderList': 100,
+                        'margin/openOrderList': 5,
+                        'margin/myTrades': 5,
+                        'balance': 4,
+                        'account': 4,
+                        'margin/maxBorrowable': 1,
+                        'margin/maxWithdraw': 1,
+                        'um/positionRisk': 1,
+                        'cm/positionRisk': 0.2,
+                        'um/positionSide/dual': 6,
+                        'cm/positionSide/dual': 6,
+                        'um/userTrades': 5,
+                        'cm/userTrades': 20,
+                        'um/leverageBracket': 0.2,
+                        'cm/leverageBracket': 0.2,
+                        'margin/forceOrders': 1,
+                        'um/forceOrders': {'cost': 20, 'noSymbol': 50},
+                        'cm/forceOrders': {'cost': 20, 'noSymbol': 50},
+                        'um/apiTradingStatus': {'cost': 0.2, 'noSymbol': 2},
+                        'um/commissionRate': 4,
+                        'cm/commissionRate': 4,
+                        'margin/marginLoan': 2,
+                        'margin/repayLoan': 2,
+                        'margin/marginInterestHistory': 0.2,
+                        'portfolio/interest-history': 10,
+                        'um/income': 6,
+                        'cm/income': 6,
+                        'um/account': 1,
+                        'cm/account': 1,
+                        'repay-futures-switch': 6,
                         'um/adlQuantile': 5,
                         'cm/adlQuantile': 5,
-                        'margin/marginLoan': 0.0667,  # Weight(UID): 10 => cost = 0.006667 * 10 = 0.06667
-                        'margin/repayLoan': 0.0667,  # Weight(UID): 10 => cost = 0.006667 * 10 = 0.06667
-                        'margin/marginInterestHistory': 0.1,  # Weight(IP): 1 => cost = 0.1 * 1 = 0.1
-                        'portfolio/interest-history': 50,  # 50
+                        'um/trade/asyn': 300,
+                        'um/trade/asyn/id': 2,
+                        'um/order/asyn': 300,
+                        'um/order/asyn/id': 2,
+                        'um/income/asyn': 300,
+                        'um/income/asyn/id': 2,
+                        'um/orderAmendment': 1,
+                        'cm/orderAmendment': 1,
+                        'um/feeBurn': 30,
+                        'um/accountConfig': 1,
+                        'um/symbolConfig': 1,
+                        'cm/accountConfig': 1,
+                        'cm/symbolConfig': 1,
+                        'rateLimit/order': 1,
                     },
                     'post': {
-                        'um/order': 1,  # 0
-                        'cm/order': 1,  # 0
-                        'margin/order': 0.0133,  # Weight(UID): 2 => cost = 0.006667 * 2 = 0.013334
-                        'marginLoan': 0.1333,  # Weight(UID): 20 => cost = 0.006667 * 20 = 0.13334
-                        'repayLoan': 0.1333,  # Weight(UID): 20 => cost = 0.006667 * 20 = 0.13334
-                        'margin/order/oco': 0.0400,  # Weight(UID): 6 => cost = 0.006667 * 6 = 0.040002
-                        'um/leverage': 1,  # 1
-                        'cm/leverage': 1,  # 1
-                        'um/positionSide/dual': 1,  # 1
-                        'cm/positionSide/dual': 1,  # 1
-                        'auto-collection': 0.6667,  # Weight(UID): 100 => cost = 0.006667 * 100 = 0.6667
-                        'bnb-transfer': 0.6667,  # Weight(UID): 100 => cost = 0.006667 * 100 = 0.6667
-                        'portfolio/repay-futures-switch': 150,  # Weight(IP): 1500 => cost = 0.1 * 1500 = 150
-                        'portfolio/repay-futures-negative-balance': 150,  # Weight(IP): 1500 => cost = 0.1 * 1500 = 150
-                        'listenKey': 1,  # 1
-                        'asset-collection': 3,
+                        'um/order': 1,
+                        'um/conditional/order': 1,
+                        'cm/order': 1,
+                        'cm/conditional/order': 1,
+                        'margin/order': 1,
+                        'marginLoan': 100,
+                        'repayLoan': 100,
+                        'margin/order/oco': 1,
+                        'um/leverage': 0.2,
+                        'cm/leverage': 0.2,
+                        'um/positionSide/dual': 0.2,
+                        'cm/positionSide/dual': 0.2,
+                        'auto-collection': 150,
+                        'bnb-transfer': 150,
+                        'repay-futures-switch': 150,
+                        'repay-futures-negative-balance': 150,
+                        'listenKey': 0.2,
+                        'asset-collection': 6,
+                        'margin/repay-debt': 3000,
+                        'um/feeBurn': 1,
                     },
                     'put': {
-                        'listenKey': 1,  # 1
+                        'listenKey': 0.2,
+                        'um/order': 1,
+                        'cm/order': 1,
                     },
                     'delete': {
-                        'um/order': 1,  # 1
-                        'um/allOpenOrders': 1,  # 1
-                        'cm/order': 1,  # 1
-                        'cm/allOpenOrders': 1,  # 1
-                        'margin/order': 1,  # Weight(IP): 10 => cost = 0.1 * 10 = 1
-                        'margin/allOpenOrders': 5,  # 5
-                        'margin/orderList': 2,  # 2
-                        'listenKey': 1,  # 1
+                        'um/order': 1,
+                        'um/conditional/order': 1,
+                        'um/allOpenOrders': 1,
+                        'um/conditional/allOpenOrders': 1,
+                        'cm/order': 1,
+                        'cm/conditional/order': 1,
+                        'cm/allOpenOrders': 1,
+                        'cm/conditional/allOpenOrders': 1,
+                        'margin/order': 2,
+                        'margin/allOpenOrders': 5,
+                        'margin/orderList': 2,
+                        'listenKey': 0.2,
+                    },
+                },
+                'papiV2': {
+                    'get': {
+                        'um/account': 1,
                     },
                 },
             },
@@ -984,7 +1125,7 @@ class binance(Exchange, ImplicitAPI):
                         'feeSide': 'quote',
                         'tierBased': True,
                         'percentage': True,
-                        'taker': self.parse_number('0.000400'),
+                        'taker': self.parse_number('0.000500'),
                         'maker': self.parse_number('0.000200'),
                         'tiers': {
                             'taker': [
@@ -1122,196 +1263,11 @@ class binance(Exchange, ImplicitAPI):
                     'BEP20': 'BSC',
                     'OMNI': 'OMNI',
                     'EOS': 'EOS',
-                    'SPL': 'SOL',
-                },
-                # keeping self object for backward-compatibility
-                'reverseNetworks': {
-                    'tronscan.org': 'TRC20',
-                    'etherscan.io': 'ERC20',
-                    'bscscan.com': 'BSC',
-                    'explorer.binance.org': 'BEP2',
-                    'bithomp.com': 'XRP',
-                    'bloks.io': 'EOS',
-                    'stellar.expert': 'XLM',
-                    'blockchair.com/bitcoin': 'BTC',
-                    'blockchair.com/bitcoin-cash': 'BCH',
-                    'blockchair.com/ecash': 'XEC',
-                    'explorer.litecoin.net': 'LTC',
-                    'explorer.avax.network': 'AVAX',
-                    'solscan.io': 'SOL',
-                    'polkadot.subscan.io': 'DOT',
-                    'dashboard.internetcomputer.org': 'ICP',
-                    'explorer.chiliz.com': 'CHZ',
-                    'cardanoscan.io': 'ADA',
-                    'mainnet.theoan.com': 'AION',
-                    'algoexplorer.io': 'ALGO',
-                    'explorer.ambrosus.com': 'AMB',
-                    'viewblock.io/zilliqa': 'ZIL',
-                    'viewblock.io/arweave': 'AR',
-                    'explorer.ark.io': 'ARK',
-                    'atomscan.com': 'ATOM',
-                    'www.mintscan.io': 'CTK',
-                    'explorer.bitcoindiamond.org': 'BCD',
-                    'btgexplorer.com': 'BTG',
-                    'bts.ai': 'BTS',
-                    'explorer.celo.org': 'CELO',
-                    'explorer.nervos.org': 'CKB',
-                    'cerebro.cortexlabs.ai': 'CTXC',
-                    'chainz.cryptoid.info': 'VIA',
-                    'explorer.dcrdata.org': 'DCR',
-                    'digiexplorer.info': 'DGB',
-                    'dock.subscan.io': 'DOCK',
-                    'dogechain.info': 'DOGE',
-                    'explorer.elrond.com': 'EGLD',
-                    'blockscout.com': 'ETC',
-                    'explore-fetchhub.fetch.ai': 'FET',
-                    'filfox.info': 'FIL',
-                    'fio.bloks.io': 'FIO',
-                    'explorer.firo.org': 'FIRO',
-                    'neoscan.io': 'NEO',
-                    'ftmscan.com': 'FTM',
-                    'explorer.gochain.io': 'GO',
-                    'block.gxb.io': 'GXS',
-                    'hash-hash.info': 'HBAR',
-                    'www.hiveblockexplorer.com': 'HIVE',
-                    'explorer.helium.com': 'HNT',
-                    'tracker.icon.foundation': 'ICX',
-                    'www.iostabc.com': 'IOST',
-                    'explorer.iota.org': 'IOTA',
-                    'iotexscan.io': 'IOTX',
-                    'irishub.iobscan.io': 'IRIS',
-                    'kava.mintscan.io': 'KAVA',
-                    'scope.klaytn.com': 'KLAY',
-                    'kmdexplorer.io': 'KMD',
-                    'kusama.subscan.io': 'KSM',
-                    'explorer.lto.network': 'LTO',
-                    'polygonscan.com': 'POLYGON',
-                    'explorer.ont.io': 'ONT',
-                    'minaexplorer.com': 'MINA',
-                    'nanolooker.com': 'NANO',
-                    'explorer.nebulas.io': 'NAS',
-                    'explorer.nbs.plus': 'NBS',
-                    'explorer.nebl.io': 'NEBL',
-                    'nulscan.io': 'NULS',
-                    'nxscan.com': 'NXS',
-                    'explorer.harmony.one': 'ONE',
-                    'explorer.poa.network': 'POA',
-                    'qtum.info': 'QTUM',
-                    'explorer.rsk.co': 'RSK',
-                    'www.oasisscan.com': 'ROSE',
-                    'ravencoin.network': 'RVN',
-                    'sc.tokenview.com': 'SC',
-                    'secretnodes.com': 'SCRT',
-                    'explorer.skycoin.com': 'SKY',
-                    'steemscan.com': 'STEEM',
-                    'explorer.stacks.co': 'STX',
-                    'www.thetascan.io': 'THETA',
-                    'scan.tomochain.com': 'TOMO',
-                    'explore.vechain.org': 'VET',
-                    'explorer.vite.net': 'VITE',
-                    'www.wanscan.org': 'WAN',
-                    'wavesexplorer.com': 'WAVES',
-                    'wax.eosx.io': 'WAXP',
-                    'waltonchain.pro': 'WTC',
-                    'chain.nem.ninja': 'XEM',
-                    'verge-blockchain.info': 'XVG',
-                    'explorer.yoyow.org': 'YOYOW',
-                    'explorer.zcha.in': 'ZEC',
-                    'explorer.zensystem.io': 'ZEN',
+                    'SPL': 'SOL',  # temporarily keep support for SPL(old name)
+                    'SOL': 'SOL',  # we shouldn't rename SOL
                 },
                 'networksById': {
-                    'tronscan.org': 'TRC20',
-                    'etherscan.io': 'ERC20',
-                    'bscscan.com': 'BSC',
-                    'explorer.binance.org': 'BEP2',
-                    'bithomp.com': 'XRP',
-                    'bloks.io': 'EOS',
-                    'stellar.expert': 'XLM',
-                    'blockchair.com/bitcoin': 'BTC',
-                    'blockchair.com/bitcoin-cash': 'BCH',
-                    'blockchair.com/ecash': 'XEC',
-                    'explorer.litecoin.net': 'LTC',
-                    'explorer.avax.network': 'AVAX',
-                    'solscan.io': 'SOL',
-                    'polkadot.subscan.io': 'DOT',
-                    'dashboard.internetcomputer.org': 'ICP',
-                    'explorer.chiliz.com': 'CHZ',
-                    'cardanoscan.io': 'ADA',
-                    'mainnet.theoan.com': 'AION',
-                    'algoexplorer.io': 'ALGO',
-                    'explorer.ambrosus.com': 'AMB',
-                    'viewblock.io/zilliqa': 'ZIL',
-                    'viewblock.io/arweave': 'AR',
-                    'explorer.ark.io': 'ARK',
-                    'atomscan.com': 'ATOM',
-                    'www.mintscan.io': 'CTK',
-                    'explorer.bitcoindiamond.org': 'BCD',
-                    'btgexplorer.com': 'BTG',
-                    'bts.ai': 'BTS',
-                    'explorer.celo.org': 'CELO',
-                    'explorer.nervos.org': 'CKB',
-                    'cerebro.cortexlabs.ai': 'CTXC',
-                    'chainz.cryptoid.info': 'VIA',
-                    'explorer.dcrdata.org': 'DCR',
-                    'digiexplorer.info': 'DGB',
-                    'dock.subscan.io': 'DOCK',
-                    'dogechain.info': 'DOGE',
-                    'explorer.elrond.com': 'EGLD',
-                    'blockscout.com': 'ETC',
-                    'explore-fetchhub.fetch.ai': 'FET',
-                    'filfox.info': 'FIL',
-                    'fio.bloks.io': 'FIO',
-                    'explorer.firo.org': 'FIRO',
-                    'neoscan.io': 'NEO',
-                    'ftmscan.com': 'FTM',
-                    'explorer.gochain.io': 'GO',
-                    'block.gxb.io': 'GXS',
-                    'hash-hash.info': 'HBAR',
-                    'www.hiveblockexplorer.com': 'HIVE',
-                    'explorer.helium.com': 'HNT',
-                    'tracker.icon.foundation': 'ICX',
-                    'www.iostabc.com': 'IOST',
-                    'explorer.iota.org': 'IOTA',
-                    'iotexscan.io': 'IOTX',
-                    'irishub.iobscan.io': 'IRIS',
-                    'kava.mintscan.io': 'KAVA',
-                    'scope.klaytn.com': 'KLAY',
-                    'kmdexplorer.io': 'KMD',
-                    'kusama.subscan.io': 'KSM',
-                    'explorer.lto.network': 'LTO',
-                    'polygonscan.com': 'POLYGON',
-                    'explorer.ont.io': 'ONT',
-                    'minaexplorer.com': 'MINA',
-                    'nanolooker.com': 'NANO',
-                    'explorer.nebulas.io': 'NAS',
-                    'explorer.nbs.plus': 'NBS',
-                    'explorer.nebl.io': 'NEBL',
-                    'nulscan.io': 'NULS',
-                    'nxscan.com': 'NXS',
-                    'explorer.harmony.one': 'ONE',
-                    'explorer.poa.network': 'POA',
-                    'qtum.info': 'QTUM',
-                    'explorer.rsk.co': 'RSK',
-                    'www.oasisscan.com': 'ROSE',
-                    'ravencoin.network': 'RVN',
-                    'sc.tokenview.com': 'SC',
-                    'secretnodes.com': 'SCRT',
-                    'explorer.skycoin.com': 'SKY',
-                    'steemscan.com': 'STEEM',
-                    'explorer.stacks.co': 'STX',
-                    'www.thetascan.io': 'THETA',
-                    'scan.tomochain.com': 'TOMO',
-                    'explore.vechain.org': 'VET',
-                    'explorer.vite.net': 'VITE',
-                    'www.wanscan.org': 'WAN',
-                    'wavesexplorer.com': 'WAVES',
-                    'wax.eosx.io': 'WAXP',
-                    'waltonchain.pro': 'WTC',
-                    'chain.nem.ninja': 'XEM',
-                    'verge-blockchain.info': 'XVG',
-                    'explorer.yoyow.org': 'YOYOW',
-                    'explorer.zcha.in': 'ZEC',
-                    'explorer.zensystem.io': 'ZEN',
+                    'SOL': 'SOL',  # temporary fix for SPL definition
                 },
                 'impliedNetworks': {
                     'ETH': {'ERC20': 'ETH'},
